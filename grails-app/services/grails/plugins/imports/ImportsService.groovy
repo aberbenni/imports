@@ -4,14 +4,19 @@ import grails.plugins.imports.logging.*
 import grails.converters.JSON
 import groovy.text.SimpleTemplateEngine
 import org.codehaus.groovy.grails.web.binding.DataBindingUtils
+import org.springframework.beans.factory.InitializingBean
 
-class ImportsService {
-    static rabbitQueue = "${grails.util.Holders.grailsApplication.metadata['app.name']}ImportRows"
+class ImportsService implements InitializingBean {
+        static rabbitQueue
 
 	def grailsApplication
 	def importsLogger
 	static IMPORT_CONFIGURATIONS = [:]
 
+	public void afterPropertiesSet() {
+        	rabbitQueue = "${grails.util.Holders.grailsApplication.metadata['app.name']}ImportRows"
+    	}
+    	
 	def handleMessage(msg) {
 		def args = JSON.parse(msg)
 		def serviceName = IMPORT_CONFIGURATIONS[args.params.entityName],
